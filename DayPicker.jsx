@@ -20,7 +20,7 @@ var DayPicker = React.createClass(/** @lends {React.ReactComponent.prototype} */
             daysArray = DateUtils.getArrayByBoundary(beforeDaysCount-offset+1, beforeDaysCount);
 
         var previousMonthDays = daysArray.map(function(day){
-            var thisDate = DateUtils.createNewDayMonth(day, date.getMonth()-1, date.getTime());
+            var thisDate = DateUtils.createNewDayMonth(day, date.getMonth()-1, 0);
             return <Day key={'day-prev-mo-' + day} date={thisDate} week={1} changeDate={this.selectDay} />
         }.bind(this));
 
