@@ -60,7 +60,7 @@ var DatePickerInput = React.createClass({
       <div className={this.props.classNamePrefix + "-input"}>
         <div style={style} onClick={this.hideDatePicker}></div>
         <div className={this.props.classNamePrefix + "-wrapper"}>
-          {this.transferPropsTo(<DatePicker date={this.props.date} show={this.state.show} onChangeDate={this.onChangeDate} />)}
+          <DatePicker {...this.props} date={this.props.date} show={this.state.show} onChangeDate={this.onChangeDate} />
         </div>
         <input type="text" onFocus={this.showDatePicker} value={this.props.dateFormatter(this.props.date)} readOnly />
       </div>
