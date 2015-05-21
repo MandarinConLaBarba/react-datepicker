@@ -13,34 +13,37 @@ var DayPicker = React.createClass(/** @lends {React.ReactComponent.prototype} */
         this.props.selectDate(date);
     },
     render: function (){
-        var date=this.props.date,
-            beforeDaysCount = DateUtils.daysInMonthCount((date.getMonth()-1), date.getFullYear()),
-            firstDay = DateUtils.createNewDay(1, date.getTime()),
-            offset = (firstDay.getDay()===0?7:firstDay.getDay())- 1,
-            daysArray = DateUtils.getArrayByBoundary(beforeDaysCount-offset+1, beforeDaysCount);
+        var pickerDate=this.props.date,
+            pickerYear = pickerDate.getFullYear(),
+            pickerMonth = pickerDate.getMonth(),
+            pickerDay = pickerDate.getDate();
 
+        var prevYear = pickerMonth === 0 ? pickerYear-1 : pickerYear,
+            prevMonth = pickerMonth === 0 ? 11 : pickerMonth-1,
+            beforeDaysCount = DateUtils.daysInMonthCount(prevMonth, prevYear),
+            firstDayOfMonth = new Date(pickerYear, pickerMonth, 1),
+            offset = (firstDayOfMonth.getDay()===0?7:firstDayOfMonth.getDay())- 1;
+        var daysArray = DateUtils.getArrayByBoundary(beforeDaysCount-offset+1, beforeDaysCount);
         var previousMonthDays = daysArray.map(function(day){
-            var thisDate = DateUtils.createNewDayMonth(day, date.getMonth()-1, date.getTime());
-            return <Day key={'day-prev-mo-' + day} date={thisDate} week={1} changeDate={this.selectDay} />
+            var prevDate = new Date(prevYear, prevMonth, day);
+            return <Day key={'day-prev-mo-' + day} date={prevDate} week={1} changeDate={this.selectDay.bind(this, prevDate)} />
         }.bind(this));
 
-        daysArray = DateUtils.getArrayByBoundary(1, DateUtils.daysInMonthCount(date.getMonth(), date.getFullYear()));
+        daysArray = DateUtils.getArrayByBoundary(1, DateUtils.daysInMonthCount(pickerMonth, pickerYear));
         var actualMonthDays = daysArray.map(function(day) {
-            var thisDate = DateUtils.createNewDay(day, date.getTime()),
+            var thisDate = new Date(pickerYear, pickerMonth, day),
                 weekNumber = Math.ceil((day+offset) / 7),
-                selected = false;
-
-            if(date.getMonth()==this.props.selectedDate.getMonth() && date.getFullYear()==this.props.selectedDate.getFullYear()) {
-                selected = (day==this.props.selectedDate.getDate());
-            }
-            return <Day key={'day-mo-' + day} selected={selected} date={thisDate} week={weekNumber} changeDate={this.selectDay} />
+                selected = (this.props.selectedDate.getFullYear() === pickerYear && this.props.selectedDate.getMonth() === pickerMonth && day === pickerDay);
+            return <Day key={'day-mo-' + day} selected={selected} date={thisDate} week={weekNumber} changeDate={this.selectDay.bind(this, thisDate)} />
         }.bind(this));
 
+        var nextYear = pickerMonth === 11 ? pickerYear+1 : pickerYear,
+          nextMonth = pickerMonth === 11 ? 0 : pickerMonth+1,
         daysArray = DateUtils.getArrayByBoundary(1, 42- previousMonthDays.length - actualMonthDays.length);
         var nextMonthDays = daysArray.map(function(day){
-            var thisDate = DateUtils.createNewDayMonth(day, date.getMonth()+1, date.getTime()),
+            var nextDate = new Date(nextYear, nextMonth, day),
                 weekNumber = Math.ceil((previousMonthDays.length + actualMonthDays.length + day) / 7);
-            return <Day key={'day-next-mo-' + day} date={thisDate} week={weekNumber} changeDate={this.selectDay} />
+            return <Day key={'day-next-mo-' + day} date={nextDate} week={weekNumber} changeDate={this.selectDay.bind(this, nextDate)} />
         }.bind(this));
 
         return (
